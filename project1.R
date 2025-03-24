@@ -36,6 +36,8 @@ beerhall_norm$beerhouses <- beerhall_dat$Beerhouses_per_100k / 1000  # Per 100 p
 beerhall_norm$school <- beerhall_dat$School_Attendance_per_10k / 100  # Per 100 people
 beerhall_norm$worship <- beerhall_dat$Worship_Attendance_per_2000 / 20  # Per 100 people
 
+head(beerhall_norm)
+write.csv(beerhall_dat, "beerhall_data.csv", row.names = FALSE)
 
 #ANALYSIS------------------------------------------------------------------------
 data = beerhall_norm
@@ -56,3 +58,4 @@ summary(beerhall.lm)
 #examine diagnostic plots: assess model assumptions and identify any influential points
 par(mfrow = c(2, 2))  # Arrange 4 plots in a 2x2 grid
 plot(beerhall.lm)  # Produces standard diagnostic plots
+
