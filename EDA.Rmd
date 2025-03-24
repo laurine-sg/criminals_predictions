@@ -1,0 +1,16 @@
+---
+title: "Report 1"
+format:
+  html:
+    embed-resources: true
+  pdf:
+    papersize: a4
+    fig-width: 6
+    fig-height: 4
+---
+
+```{r}
+
+data <- read.csv("beerhall_data.csv")
+head(data)
+```

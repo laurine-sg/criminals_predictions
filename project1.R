@@ -22,22 +22,23 @@ column_names <- c(
 colnames(beerhall_dat) <- column_names
 #check data import 
 head(beerhall_dat)
+write.csv(beerhall_norm, "beerhall_data_raw.csv", row.names = FALSE)
 
 #NORMALISATION
 
 #transform to percentage
 # Initialize an empty data frame with the same structure as beerhall_dat
-beerhall_norm <- data.frame(criminals = numeric(nrow(beerhall_dat)),
-                            beerhouses = numeric(nrow(beerhall_dat)),
-                            school = numeric(nrow(beerhall_dat)),
-                            worship = numeric(nrow(beerhall_dat)))
-beerhall_norm$criminals <- beerhall_dat$Criminals_per_100k / 1000  # Per 100 people
-beerhall_norm$beerhouses <- beerhall_dat$Beerhouses_per_100k / 1000  # Per 100 people
-beerhall_norm$school <- beerhall_dat$School_Attendance_per_10k / 100  # Per 100 people
-beerhall_norm$worship <- beerhall_dat$Worship_Attendance_per_2000 / 20  # Per 100 people
+beerhall_norm <- data.frame(criminals_per_100 = numeric(nrow(beerhall_dat)),
+                            beerhouses_per_100 = numeric(nrow(beerhall_dat)),
+                            school_per_100 = numeric(nrow(beerhall_dat)),
+                            worship_per_100 = numeric(nrow(beerhall_dat)))
+beerhall_norm$criminals_per_100 <- beerhall_dat$Criminals_per_100k / 1000  # Per 100 people
+beerhall_norm$beerhouses_per_100 <- beerhall_dat$Beerhouses_per_100k / 1000  # Per 100 people
+beerhall_norm$school_per_100 <- beerhall_dat$School_Attendance_per_10k / 100  # Per 100 people
+beerhall_norm$worship_per_100 <- beerhall_dat$Worship_Attendance_per_2000 / 20  # Per 100 people
 
 head(beerhall_norm)
-write.csv(beerhall_dat, "beerhall_data.csv", row.names = FALSE)
+write.csv(beerhall_norm, "beerhall_data_norm.csv", row.names = FALSE)
 
 #ANALYSIS------------------------------------------------------------------------
 data = beerhall_norm
