@@ -29,6 +29,7 @@ colSums(is.na(data))
 ```{r}
 # Install and load gridExtra
 install.packages("gridExtra")
+library(ggplot2)
 library(gridExtra)
 
 # Create individual histograms
