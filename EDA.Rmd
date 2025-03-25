@@ -10,7 +10,115 @@ format:
 ---
 
 ```{r}
-
-data <- read.csv("beerhall_data.csv")
+data <- read.csv("beerhall_data_norm.csv")
 head(data)
+```
+
+-   Univariate Numerical Analysis:
+
+```{r}
+summary(data)
+```
+
+```{r}
+colSums(is.na(data))
+```
+
+-   Univariate Graphical Analysis:
+
+```{r}
+# Install and load gridExtra
+install.packages("gridExtra")
+library(gridExtra)
+
+# Create individual histograms
+hist1 <- ggplot(data, aes(x = criminals_per_100)) + 
+  geom_histogram(bins = 20, fill = "blue", alpha = 0.5) +
+  labs(title = "Criminals per 100")
+
+hist2 <- ggplot(data, aes(x = beerhouses_per_100)) + 
+  geom_histogram(bins = 20, fill = "red", alpha = 0.5) +
+  labs(title = "Beerhouses per 100")
+
+hist3 <- ggplot(data, aes(x = school_per_100)) + 
+  geom_histogram(bins = 20, fill = "green", alpha = 0.5) +
+  labs(title = "School per 100")
+
+hist4 <- ggplot(data, aes(x = worship_per_100)) + 
+  geom_histogram(bins = 20, fill = "purple", alpha = 0.5) +
+  labs(title = "Worship per 100")
+
+# Arrange the plots side by side
+grid.arrange(hist1, hist2, hist3, hist4, ncol = 2)
+
+```
+
+```{r}
+boxplot(data$school_per_100, data$worship_per_100,
+        names = c("School", "Worship"),
+        col = c("green", "purple"),
+        main = "Boxplots of Continuous Variables",
+        xlab = "Variable",
+        ylab = "Value")
+
+```
+
+```{r}
+boxplot(data$criminals_per_100, data$beerhouses_per_100,
+        names = c("Criminals", "Beerhouses"),
+        col = c("blue", "red"),
+        main = "Boxplots of Continuous Variables",
+        xlab = "Variable",
+        ylab = "Value")
+
+```
+
+Boxplots are separated in two for better visualization because the scale are too different.
+
+-   Bivariate Numerical Analysis :
+
+```{r}
+# Correlation matrix
+cor_matrix <- cor(data, use = "complete.obs")
+print(cor_matrix)
+
+```
+
+```{r}
+# Visualizing correlation
+library(corrplot)
+corrplot(cor_matrix, method = "circle")  
+```
+
+-   Bivariate Graphical Analysis
+
+```{r}
+
+# Scatter plot: Beerhouses vs Criminals
+plot(data$beerhouses_per_100, data$criminals_per_100, 
+     main = "Criminals vs Beerhouses",
+     xlab = "Beerhouses per 100", ylab = "Criminals per 100",
+     col = "blue", pch = 16)  # pch=16 gives solid circles
+abline(lm(criminals_per_100 ~ beerhouses_per_100, data = data), col = "red", lwd = 2)
+```
+
+```{r}
+
+# Scatter plot: School Attendance vs Criminals
+plot(data$school_per_100, data$criminals_per_100, 
+     main = "Criminals vs School Attendance",
+     xlab = "School Attendance per 100", ylab = "Criminals per 100",
+     col = "green", pch = 16)
+abline(lm(criminals_per_100 ~ school_per_100, data = data), col = "red", lwd = 2)
+```
+
+```{r}
+# Scatter plot: Worship Attendance vs Criminals
+plot(data$worship_per_100, data$criminals_per_100, 
+     main = "Criminals vs Worship Attendance",
+     xlab = "Worship Attendance per 100", ylab = "Criminals per 100",
+     col = "purple", pch = 16)
+abline(lm(criminals_per_100 ~ worship_per_100, data = data), col = "red", lwd = 2)
+
+
 ```
