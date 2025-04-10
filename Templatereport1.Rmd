@@ -184,6 +184,8 @@ plot(best_model)  # Produces standard diagnostic plot
 
 ### Conclusions
 
+To conclude, we managed to find a model that was able to predict the number of criminals in a county as a function of the number of beer houses and school attendance. On average, in British counties circa 1850, there were 180 criminals per 100k population. More beer houses make the number of criminals increase while more school attendance makes it decrease. To illustrate, approximately 8 additional beerhouses per 100k pop would lead to 1 additional criminal. Controversy, 100 additional school attendants would reduce the number of criminals by 1. We also found that the worship attendance was not a variable significant enough to predict the number of Criminals. The adjusted R-squared value for our model is acceptable, meaning a part of the variability of the observed data is explained by the chosen variables. However, they do not explain all the variability and it could be interesting to add more variables (e.g. profession, age, salary). It could also increase the accuracy and significance of our model by adding more data. It would allow us to exclude some outliers we decided not to exclude as we did not have a sample large enough. It would also be better to fit the model assumptions.
+
 ### References 
 
 Clay, John. "On the Relation Between Crime, Popular Instruction, Attendance on Religious Worship, and Beer-House." Journal of the Statistical Society of London 20, no. 1 (March 1857): 22-32. <https://www.jstor.org/stable/2338159>.
