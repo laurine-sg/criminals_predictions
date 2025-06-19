@@ -18,17 +18,14 @@ header-includes:
 ---
 
 \begin{center}
-    {\LARGE \textbf{Criminals Population Prediction}} \\[0.5em]
-    {\large Laurine Song, Marine Ract, Mathilde Roulleau, Julie Le Flem}
+    {\LARGE \textbf{Predicting counties’ Criminals Population based on Beerhouses, School and Worship attendance}} \\[1em]
 \end{center}
 
 ### Introduction
 
-One could imagine that attending school or practicing a religion might reduce criminality, and that alcohol consumption might increase it.
+One could imagine that attending school or practicing a religion might reduce criminality, and that alcohol consumption might increase it. Using proxy for those behavior, respectively the proportion of population attending school and worship, and the proportion of bars per habitant, we attempt to model criminality as a function of these proxy using linear regression.
 
-Using proxy for those behavior —respectively the proportion of population attending school and worship, and the proportion of bars per habitant— we attempt to model criminality as a function of these proxy using linear regression.
-
-The dataset we are using is extracted from a statistical journal (Clay 1857), which includes data from 40 different English counties taken over 5 years ending in 1853. The following features were given for each county: 
+The dataset we are using is extracted from a statistical journal \[1\], which includes data from 40 different English counties taken over 5 years ending in 1853. The following features were given for each county: 
 
 -   County 
 
@@ -46,73 +43,27 @@ The dataset we are using is extracted from a statistical journal (Clay 1857), wh
 
 #### Research question
 
-Is there a relation between crime, popular instruction, attendance on religious worship, and beer-house? What could be changed to reduce criminality in these counties ? What influences the criminality in these counties ?
+Is there a relationship between the number of criminals of England’s counties and popular instruction, attendance on religious worship, and number of beer-house? To what extent do these features predict the number of criminals in counties?
 
 ### Exploratory Data Analysis
 
-For this statistical analysis, we select the 4 last features, load them and normalize them to get all the numbers per 100. We then check that there is no missing value (Table 1). 
+For this statistical analysis, we select the 4 last features, load them and normalize them to get all the numbers per 100. Before starting the exploration of the dataset, we first verified that there were no missing values in the dataframe. Then, we perform a numerical (Table 1) and graphical (Figure 1) univariate analysis for the 4 continuous variables.
 
-To start the exploration of the data, we perform a numerical and graphical univariate analysis for the 4 continuous variables (Table 2, Figure 1). The distribution of criminals per 100 inhabitants appears right-skewed (Figure 1.1), meaning most areas have a low to moderate number of criminals per 100 people. The distribution of beer houses is more spread out (Figure 1.2), suggesting variability in the number of beerhouses per 100 people across locations. There seem to be two peaks (bimodal distribution), indicating that some areas have relatively few beerhouses while others have many. The distribution of school attendance shows a somewhat normal distribution (Figure 1.3), with most values concentrated around 9 to 11 schools per 100. It suggests that the number of schools per 100 people is relatively stable across different areas. The distribution of worship attendance presents multiple peaks spread out between 20 and 60 (Figure 1.4), suggesting a high variability of religious density across areas. 
-
-We then perform a numerical and graphical bivariate analysis for the 4 continuous variables (Table 3, Figure 2). We plot the pairwise correlations of all variables and compute the numerical strength of association between all pairs of variables with Pearson’s correlation coefficients. Criminals are positively correlated with beer houses (0.46) and show almost no correlation with school and worship. The two predictors school and worship are highly positively correlated (0.60).
-
-### Model Fitting
-
-Given that we are predicting criminals per 100 inhabitants as a function of other variables, we consider a multiple linear regression: $$Y = \beta_0 + \beta_1 *X_1 + ... + \beta_n *X_n$$
-
-with $Y$: Dependent variable, $X_n$: Predictors, and $\beta_n$: Estimated coefficients.
-
-We want to develop the best predictive equation for criminality based on the 3 predictors: instruction, attendance on religious worship, and the beer-houses. To do so, we select the best model using the Forward selection approach, a stepwise regression technique that starts with an empty model and iteratively adds the most significant predictor until no further improvement is possible. At each step, the Akaike Information Criterion (AIC) is computed until the lowest value is reached. This approach fits the models using Ordinary Least Squares (OLS). The process starts with an empty model (Criminals∼1).\
-The first variable added is Beerhouses, which significantly reduces the AIC from -253.74 to -261.38. The second variable added is School, which further reduces the AIC to -264.10. Adding Worship does not improve the model significantly (AIC only decreases to -263.09), so it is not included in the final model (Table 4). 
-
-We obtain a model (Table 5) with significant coefficients, all associated with a p-value \< 0.05. The adjusted R-squared, equal to 0.26, is low meaning that only 26% of the variance is explained by the independent variables. 
-
-### Model Assessment
-
-In our selected model, we ideally want the errors to have mean 0, to be homoscedastic (same variance), uncorrelated and normally distributed. To carry out these assessments, we plot the residuals vs. fitted, the QQ normal plot of residuals, the scale-location plot and the residuals vs. Leverage. 
-
--   The red smoothed line suggests slight curvature, which may indicate non-linearity. The spread appears somewhat uneven, hinting at possible heteroscedasticity (Figure 3.1)
-
--   There is deviation at the upper end (right tail), meaning some residuals are not normally distributed, which could indicate outliers or skewness (Figure 3.2).
-
--   Some variation in spread is present, which may indicate heteroscedasticity (Figure 3.3).
-
--   Some points, like "240" and "230," are more distant, suggesting potential influential observations (Figure 3.4).
-
-These 4 plots suggest that our model presents issues of non-linearity, heteroscedasticity and non-normality residuals as well as some influential points.
-
-### Final estimated model
-
-The linear model that best predicts the number of criminals in the English counties as a function of beer houses and school attendance is defined as:
-
-$\hat{Criminals}= 0.18 + 0.13*Beerhouses - 0.01 *School$
-
-### Plots
-
-```{r, echo=FALSE}
+```{r, fig1, fig.cap = "\\begin{center} Table 1: Statistical summary of the data.\\end{center}", echo=FALSE, warning=FALSE}
 data <- read.csv("beerhall_data_norm.csv")
-```
-
-```{r, fig1, fig.cap= "Table 1 : Missing values in the data.", echo=FALSE}
-library(magrittr)
-library(kableExtra)
-
-table <- colSums(is.na(data))
-table_df <- as.data.frame(table)
-colnames(table_df) <- "Missing Values"
-kable(table_df) %>%
-  kable_styling(full_width = FALSE)
-```
-
-```{r, fig2, fig.cap = "Table 2: Statistical summary of the data.", echo=FALSE}
 library(knitr)
 library(kableExtra)
-summary_table <- summary(data)
-kable(summary_table) %>%
+
+summary_table <- sapply(data[, c("criminals_per_100", "beerhouses_per_100", "school_per_100", "worship_per_100")], function(x) {
+  stats <- summary(x)
+  round(stats, 2)
+})
+summary_table <- t(summary_table)
+kable(summary_table, digits = 2) %>%
   kable_styling(full_width = FALSE)
 ```
 
-```{r, fig3, fig.cap = "Distribution of the Variables", echo = FALSE}
+```{r, fig2, fig.cap = "Distribution of the Variables", echo = FALSE, message=FALSE, warning=FALSE}
 # Install and load gridExtra
 library(ggplot2)
 library(gridExtra)
@@ -139,24 +90,57 @@ grid.arrange(hist1, hist2, hist3, hist4, ncol = 2)
 
 ```
 
-```{r, fig4, fig.height=2, fig.cap ="Table 3: Pearson's correlation coefficients.", echo = FALSE}
-# Correlation matrix
-cor_matrix <- cor(data, use = "complete.obs")
-?cor
-kable(cor_matrix) %>%
-  kable_styling(full_width = FALSE, font_size = 10)
+In Figure 1, the distribution of criminals per 100 inhabitants appears right-skewed, meaning most areas have a low to moderate number of criminals per 100 people. The distribution of beer houses is more spread out, suggesting variability in the number of beerhouses per 100 people across locations. There seem to be two peaks (bimodal distribution), indicating that some areas have relatively few beerhouses while others have many. The distribution of school attendance shows a somewhat normal distribution, with most values concentrated around 9 to 11 schools per 100. It suggests that the number of schools per 100 people is relatively stable across different areas. At last, the distribution of worship attendance presents multiple peaks spread out between 20 and 60, suggesting a high variability of religious density across areas. 
+
+We then perform a numerical and graphical bivariate analysis for the 4 continuous variables (Figure 2). We plot the pairwise correlations of all variables and compute the numerical strength of association between all pairs of variables with Pearson’s correlation coefficients. These coefficients quantify the strength and direction of the linear relationships between two continuous variables. For two variables $X$ and $Y$, the Pearson correlation coefficient r is:
+
+$$
+r = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^{n} (X_i - \bar{X})^2 \sum_{i=1}^{n} (Y_i - \bar{Y})^2}}
+$$
+
+Where $X_i$, $Y_i$ are individual observations, and $\bar{X}$, $\bar{Y}$ are the sample means of $X$ and $Y$.
+
+Therefore, criminals are positively correlated with beer houses (0.46) and show almost no or weak correlation with school and worship. Also, the two predictors school and worship are highly positively correlated (0.60).
+
+```{r, fig3, fig.cap ="Pairplots of the variables with their Pearson's correlation coefficients.", echo= FALSE, fig.width=6, fig.height=6, message=FALSE, warning=FALSE}
+library(GGally)
+library(ggplot2)
+
+# Create ggpairs plot with rounded correlation coefficients
+ggpairs(
+  data,
+  columns = c("beerhouses_per_100", "school_per_100", "worship_per_100", "criminals_per_100"),
+  upper = list(continuous = wrap("cor",digits=2)),
+)
+
 ```
 
-```{r, fig5, fig.cap ="Pairwise Correlation of the variables.", echo= FALSE}
+### Model Fitting
+
+We aim to predict the number of criminals per 100 inhabitants as a function of other variables using a multiple linear regression:\
+$$C = \beta_0 + \beta_1 *X_1 + ... + \beta_n *X_n + \epsilon $$
+
+with $C$ the number of Criminals per 100 inhabitants, $X_i$: the predictors selected among instruction, attendance on religious worship, $\beta_i$ the estimated coefficients for each corresponding predictors, and $\epsilon$ the error term.
+
+To develop the best predictive equation for criminality based on the three predictors : instruction, attendance on religious worship, and beer-houses, we use the Forward Selection \[2\] approach. This is a stepwise regression technique that begins with an empty model and iteratively adds the most statistically significant predictor at each step, continuing until no further improvement in model performance is observed. The model selection at each stage is guided by the Akaike Information Criterion (AIC) \[3\], which balances model fit and complexity. The AIC is a measure of the relative quality of statistical models for a given dataset; it is defined as: $$AIC=2k−2ln(L)$$
+
+where k is the number of estimated parameters in the model, and L is the maximum value of the likelihood function for the model. A lower AIC indicates a better model by penalizing unnecessary complexity while rewarding goodness of fit. The process continues until the AIC cannot be further minimized. All models are fitted using Ordinary Least Squares (OLS) estimation.
+
+The process starts with an empty model containing no predictors.
+
+-   The first variable added is Beerhouses, which significantly reduces the AIC from $-253.74$ to $-261.38$.
+
+-   The second variable added is School, which further reduces the AIC to $-264.10$.
+
+-   The third candidate variable, Worship, leads to an increase in AIC ($–263.09$). Worship is therefore not included in the final model.
+
+This results in a final model that includes only Beerhouses and School as predictors of criminality, in which all coefficients are statistically significant, with associated p-values \< 0.05 (Table 2). The residual standard error is $0.04$, indicating that the typical deviation of the observed values from the predicted values is approximately 0.036 units, in the scale of the number of criminals. The model explains approximately 26% of the variance in the number of criminals, as indicated by an adjusted R-squared of $0.26$. The model's overall significance is supported by an F-statistic of $7.99$, with a corresponding p-value of $0.001$. The multiple R-squared is $0.30$, indicating 30% of variance in the number of criminal is explained by the model before adjusting for the number of predictors.
+
+```{r, include=FALSE}
 Beerhouses <- data$beerhouses_per_100 
 Criminals <- data$criminals_per_100
 School <- data$school_per_100
 Worship <- data$worship_per_100
-
-pairs(~ Beerhouses + Criminals + School + Worship)
-```
-
-```{r, fig6, fig.cap ="Table 4: Forward model selection.", echo=FALSE}
 # Define full model with all predictors
 full_model <- lm(Criminals ~ Beerhouses + School + Worship, data = data)
 
@@ -167,25 +151,46 @@ null_model <- lm(Criminals ~ 1, data = data)
 best_model <- step(null_model, direction = "forward", scope = formula(full_model))
 ```
 
-Table 4: Forward model selection.
+| Variable   | Estimate | Std. Error | t value | Pr(\>\|t\|) |        |
+|------------|----------|------------|---------|-------------|--------|
+| Intercept  | 0.18     | 3.52e-2    | 5.07    | 1.12e-05    | \*\*\* |
+| Beerhouses | 0.13     | 3.48e-2    | 3.63    | 8.54e-04    | \*\*\* |
+| School     | -7.65e-3 | 3.56e-3    | -2.15   | 3.81e-02    | .      |
 
-```{r, echo = FALSE, fig7, fig.cap ="Table 5: Result of Forward Model Selection."}
-# Display best model summary
-summary(best_model)
-```
+\begin{center}
 
-Table 5: Result of Forward Model Selection.
+Table 2: Coefficient estimates after the forward model selection. The model is `Criminals \textasciitilde{} Beerhouses + School`. Significance codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-```{r,fig8, fig.cap ="Diagnostic Plots.", fig.width=12, fig.height=12, echo=FALSE}
+\end{center}
+
+### Model Assessment
+
+```{r,fig4, fig.cap = "\\textbf{Diagnostic Plots. 1) Residuals vs. Fitted}: Shows residuals against predicted values. Random scatter around the horizontal line at 0 indicates good fit. The red line shows the local average. \\textbf{2) Normal Q-Q}: Compares standardized residuals to a normal distribution. Points should lie along the dashed diagonal if residuals are normally distributed. \\textbf{3) Scale-Location}: Plots the square root of absolute standardized residuals vs. fitted values. A horizontal red line and random scatter suggest constant variance (homoscedasticity). \\textbf{4) Residuals vs. Leverage}: Identifies influential points by plotting standardized residuals against leverage. Dashed Cook’s distance lines highlight observations with high influence.", fig.width=12, fig.height=12, echo=FALSE}
 #examine diagnostic plots: assess model assumptions and identify any influential points
 par(mfrow = c(2, 2))  # Arrange 4 plots in a 2x2 grid
+par(cex.lab = 1.5,        # Axis labels (x and y)
+    cex.axis = 1.3,       # Axis tick labels
+    cex.main =3,     # main titles
+    cex.sub = 3)      # subtitles
 plot(best_model)  # Produces standard diagnostic plot
 ```
 
-### Conclusions
+### Final estimated model
 
-To conclude, we managed to find a model that was able to predict the number of criminals in a county as a function of the number of beer houses and school attendance. On average, in British counties circa 1850, there were 180 criminals per 100k population. More beer houses make the number of criminals increase while more school attendance makes it decrease. To illustrate, approximately 8 additional beerhouses per 100k pop would lead to 1 additional criminal. Controversy, 100 additional school attendants would reduce the number of criminals by 1. We also found that the worship attendance was not a variable significant enough to predict the number of Criminals. The adjusted R-squared value for our model is acceptable, meaning a part of the variability of the observed data is explained by the chosen variables. However, they do not explain all the variability and it could be interesting to add more variables (e.g. profession, age, salary). It could also increase the accuracy and significance of our model by adding more data. It would allow us to exclude some outliers we decided not to exclude as we did not have a sample large enough. It would also be better to fit the model assumptions.
+The linear model that best predicts the number of criminals in the English counties as a function of beer houses and school attendance is defined as:
 
-### References 
+$\hat{Criminals}= 0.18 + 0.13*Beerhouses - 0.01 *School +\epsilon$
 
-Clay, John. "On the Relation Between Crime, Popular Instruction, Attendance on Religious Worship, and Beer-House." Journal of the Statistical Society of London 20, no. 1 (March 1857): 22-32. <https://www.jstor.org/stable/2338159>.
+### Conclusion
+
+To conclude, we developed a linear model predicting the number of criminals in a county as a function of the number of beer houses and school attendance. On average, in British counties circa 1850, there were 180 criminals per 100,000 population. The number of beer houses is positively associated with criminality, while school attendance is negatively associated. Specifically, an increase of approximately 8 beer houses per 100,000 people is associated with one additional criminal, whereas an increase of 100 school attendants per 100,000 corresponds to a decrease of one criminal. Worship attendance did not significantly contribute to predicting criminality and was excluded from the final model.
+
+The adjusted R-squared value of 0.26 indicates that the model explains about 26% of the variation in criminality, leaving a substantial portion unexplained. Including additional variables such as profession, age, or income might improve the model. Moreover, a larger dataset would enhance model reliability, allow for more robust outlier detection, and better satisfy assumptions such as normality and homoscedasticity.
+
+### References
+
+\[1\] Clay, John. "On the Relation Between Crime, Popular Instruction, Attendance on Religious Worship, and Beer-House." Journal of the Statistical Society of London 20, no. 1 (March 1857): 22-32. <https://www.jstor.org/stable/2338159>.
+
+\[2\] James, G., Witten, D., Hastie, T., & Tibshirani, R. (2013). An Introduction to Statistical Learning with Applications in R. Springer.
+
+\[3\] Akaike, H. (1974). A new look at the statistical model identification. IEEE Transactions on Automatic Control, 19(6), 716-723.
